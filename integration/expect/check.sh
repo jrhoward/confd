@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+#set -ex
 
 diff /tmp/confd-basic-test.conf integration/expect/basic.conf
 diff /tmp/confd-exists-test.conf integration/expect/exists-test.conf
