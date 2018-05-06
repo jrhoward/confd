@@ -63,11 +63,10 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	klen := len(keys)
 	kklen := len(knownkeys)
 	k := 0
-	// This works because both sets of keys are sorted
-	// and we keep a reference of where we are up to so as not to access any value more than once
+	// This works because both sets of keys are sorted and we keep a reference of where we are up to so as not to access any value more than once
 	for kk := 0; kk < kklen && k < klen; {
 		found := false
-		for kk < kklen && strings.HasPrefix(knownkeys[kk], keys[k]) {
+		for kk < kklen && keyMatches(knownkeys[kk], keys[k]) {
 			found = true // knownkeys entry is found with the prefix we are looking for
 			keysToRetrieve = append(keysToRetrieve, knownkeys[kk])
 			kk++
@@ -130,6 +129,24 @@ func (c *Client) getSecretValue(name string) (SecretString, error) {
 		Secret: *resp.SecretString,
 	}
 	return secret, nil
+}
+
+// logic for matching keys
+func keyMatches(knownkey string, key string) bool {
+	// exact match
+	if knownkey == key {
+		return true
+	}
+	// prep the key so we dont get partial matches
+	if !strings.HasSuffix(key, "/") {
+		key += "/"
+	}
+
+	if strings.HasPrefix(knownkey, key) {
+		return true
+	} else {
+		return false
+	}
 }
 
 // WatchPrefix is not implemented
